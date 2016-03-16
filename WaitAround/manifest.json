@@ -1,0 +1,8 @@
+{
+    "displayName": "Wait Around",
+    "author": "Alhifar",
+    "version": "0.1",
+    "description": "Wait around for something to happen",
+
+    "assemblyFileName": "WaitAround.dll"
+}
