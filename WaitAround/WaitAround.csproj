@@ -64,6 +64,10 @@
       <HintPath>..\..\..\Storm\Storm\Storm\bin\Debug\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Stardew Valley">
+      <HintPath>..\..\..\..\..\Downloads\StardewValley.v1.05\Stardew Valley.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="StormLoader, Version=0.1.1.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Storm\Storm\Storm\bin\Debug\StormLoader.exe</HintPath>
@@ -76,11 +80,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Content Include="images\testButton.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

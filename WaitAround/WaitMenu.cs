@@ -11,37 +11,93 @@ namespace WaitAround
 {
     class WaitMenu : ClickableMenuDelegate
     {
-        public StaticContext root { get; set; }
-        private WaitAround mod { get; set; }
-        private Vector2 menuTopLeft { get; set; }
-        private List<MenuButton> buttons { get; set; }
+        public StaticContext Root { get; set; }
+        private WaitAround Mod { get; set; }
+        private Rectangle MenuRect { get; set; }
+        private List<MenuButton> Buttons { get; set; }
+
         public WaitMenu(StaticContext root, WaitAround mod)
         {
-            this.root = root;
-            this.mod = mod;
-            this.buttons = new List<MenuButton>();
-            string imagePath = Path.Combine(mod.PathOnDisk, "images");
+            this.Root = root;
+            this.Mod = mod;
+            this.Buttons = new List<MenuButton>();
 
-            Texture2D testButtonTex = root.LoadResource(Path.Combine(imagePath, "testButton.png"));
-            buttons.Add(new MenuButton(15, 15, 5, 5, testButtonTex, testButton));
+            Texture2D upArrowTex = getTextureFromTileSheet(this.Root.MouseCursors, 12, 64, 64);
+            Texture2D downArrowTex = getTextureFromTileSheet(this.Root.MouseCursors, 11, 64, 64);
+            Texture2D okButtonTex = getTextureFromTileSheet(this.Root.MouseCursors, 46, 64, 64);
+
+            Buttons.Add(new MenuButton(64, 64, -1 * (MenuRect.Width / 4), (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2), this.MenuRect, upArrowTex, upButton));
+            Buttons.Add(new MenuButton(64, 64, -1 * (MenuRect.Width / 4), (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10, this.MenuRect, downArrowTex, downButton));
+            Buttons.Add(new MenuButton(64, 64, -1 * (MenuRect.Width / 4), (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10 + 64 + 10, this.MenuRect, okButtonTex, enterButton));
         }
 
-        private void drawButton(SpriteBatch b, MenuButton button)
+        public Texture2D getTextureFromTileSheet(Texture2D tileSheet, int tilePosition, int width, int height)
         {
-            Rectangle finalButtonRect = new Rectangle((int) menuTopLeft.X + button.buttonRect.X, (int) menuTopLeft.Y + button.buttonRect.Y, button.buttonRect.Width, button.buttonRect.Height);
-            b.Draw(button.buttonTex, finalButtonRect, Color.White);
+            Rectangle sourceRectangle = StardewValley.Game1.getSourceRectForStandardTileSheet(tileSheet, tilePosition, width, height);
+            Texture2D newTexture = new Texture2D(Root.Graphics.GraphicsDevice, sourceRectangle.Width, sourceRectangle.Height);
+            Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
+            tileSheet.GetData(0, sourceRectangle, data, 0, data.Length);
+            newTexture.SetData(data);
+            return newTexture;
         }
-        private void testButton()
+
+        private void upButton(MenuButton menuButton)
         {
-            Console.Write("WaitAround: Pushed Test Button");
+            Mod.timeToWait += 10;
         }
+
+        private void downButton(MenuButton menuButton)
+        {
+            Mod.timeToWait -= 10;
+        }
+
+        private void enterButton(MenuButton menuButton)
+        {
+            Root.TimeOfDay = WaitAround.getTimeFromOffset(Root.TimeOfDay, Mod.timeToWait);
+            Mod.timeToWait = 0;
+            this.Close();
+        }
+
+        public void Close()
+        {
+            Root.ActiveClickableMenu = null;
+            Mod.drawingWaitMenu = false;
+            Mod.timeToWait = 0;
+        }
+
         public override void Draw(SpriteBatch b)
         {
-            menuTopLeft = drawBaseMenu(b, 300, 150, 500, 450);
-            foreach (MenuButton button in buttons)
+            SpriteBatch b2 = new SpriteBatch(b.GraphicsDevice);
+            b2.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, (DepthStencilState)null, (RasterizerState)null);
+            MenuRect = drawBaseMenu(b2, 450, 300, 550, 300);
+            foreach (MenuButton button in Buttons)
             {
-                drawButton(b, button);
+                // HACK HACK HACK THIS IS SO BAD
+                if (button.id == 1 || button.id == 2 || button.id == 3)
+                {
+                    button.relativeX = -1 * (MenuRect.Width / 4);
+                }
+                if (button.id == 1)
+                {
+                    button.relativeY = (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2);
+                }
+                if (button.id == 2)
+                {
+                    button.relativeY = (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10;
+                }
+                if (button.id == 3)
+                {
+                    button.relativeY = (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10 + 64 + 10;
+                }
+                button.Draw(b2, MenuRect);
             }
+            String titleString = "How long do you want to wait?";
+            Console.WriteLine(Root.DialogueFont.MeasureString(titleString).X);
+            b2.DrawString(Root.DialogueFont, titleString, new Vector2(MenuRect.X + (MenuRect.Width / 2) - (Root.DialogueFont.MeasureString(titleString).X / 2), MenuRect.Y + 15), Color.Black);
+            String timeString = String.Format("{0:00}:{1:00}", Math.Floor(Mod.timeToWait / 60.0), Mod.timeToWait % 60);
+            b2.DrawString(this.Root.DialogueFont, timeString, new Vector2((MenuRect.Width / 2) - (this.Root.DialogueFont.MeasureString(timeString).X) + MenuRect.X, (MenuRect.Height / 2) - (this.Root.DialogueFont.MeasureString(timeString).Y) + MenuRect.Y), Color.Black, 0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+            b2.Draw(Root.MouseCursors, new Vector2(Root.OldMouseState.X, Root.OldMouseState.Y), StardewValley.Game1.getSourceRectForStandardTileSheet(Root.MouseCursors, 0, 16, 16), Color.White, 0.0f, Vector2.Zero, Root.PixelZoom + (Root.DialogueButtonScale / 150), SpriteEffects.None, 0f);
+            b2.End();
         }
 
         public override void EmergencyShutDown()
@@ -73,19 +129,18 @@ namespace WaitAround
         {
             Rectangle mouseRect = new Rectangle(x, y, 1, 1);
 
-            foreach (MenuButton button in buttons)
+            foreach (MenuButton button in Buttons)
             {
-                Rectangle finalButtonRect = new Rectangle((int)menuTopLeft.X + button.buttonRect.X, (int)menuTopLeft.Y + button.buttonRect.Y, button.buttonRect.Width, button.buttonRect.Height);
-                if (mouseRect.Intersects(finalButtonRect))
+                if (mouseRect.Intersects(button.buttonRect))
                 {
-                    button.callbackFunction();
+                    button.callbackFunction(button);
                 }
             }
         }
 
         public override void ReceiveRightClick(int x, int y, bool playSound = true)
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public override void ReceiveScrollWheelAction(int direction)
@@ -99,11 +154,11 @@ namespace WaitAround
         }
 
         //Borrowed from NPCLocations by Kemenor
-        private Vector2 drawBaseMenu(SpriteBatch b, int leftRightPadding, int upperLowerPadding, int minWidth, int minHeight)
+        private Rectangle drawBaseMenu(SpriteBatch b, int leftRightPadding, int upperLowerPadding, int minWidth, int minHeight)
         {
-            Texture2D MenuTiles = this.root.Content.Load<Texture2D>("MenuTiles");
-            var font = root.SmallFont;
-            var viewport = root.Viewport;
+            Texture2D MenuTiles = this.Root.Content.Load<Texture2D>("MenuTiles");
+            var font = Root.SmallFont;
+            var viewport = Root.Viewport;
             var textColor = Color.Black;
 
             //calculate the dimensions of the menu
@@ -121,7 +176,7 @@ namespace WaitAround
             }
 
             //Texture2D for the menu
-            Texture2D menu = new Texture2D(root.Graphics.GraphicsDevice, width, height);
+            Texture2D menu = new Texture2D(Root.Graphics.GraphicsDevice, width, height);
             //get the upper left corner of the menu
             Vector2 screenLoc = new Vector2(leftRightPadding, upperLowerPadding);
 
@@ -198,7 +253,7 @@ namespace WaitAround
             //draw lower right Corner
             b.Draw(MenuTiles, menubar + new Vector2(rightUpperCorner, leftLowerCorner), lowerRight, Color.White);
 
-            return screenLoc;
+            return new Rectangle((int) screenLoc.X, (int) screenLoc.Y, width, height);
         }
     }
 }
