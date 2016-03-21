@@ -26,9 +26,9 @@ namespace WaitAround
             Texture2D downArrowTex = getTextureFromTileSheet(this.Root.MouseCursors, 11, 64, 64);
             Texture2D okButtonTex = getTextureFromTileSheet(this.Root.MouseCursors, 46, 64, 64);
 
-            Buttons.Add(new MenuButton(64, 64, -1 * (MenuRect.Width / 4), (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2), this.MenuRect, upArrowTex, upButton));
-            Buttons.Add(new MenuButton(64, 64, -1 * (MenuRect.Width / 4), (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10, this.MenuRect, downArrowTex, downButton));
-            Buttons.Add(new MenuButton(64, 64, -1 * (MenuRect.Width / 4), (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10 + 64 + 10, this.MenuRect, okButtonTex, enterButton));
+            Buttons.Add(new MenuButton(64, 64, 0, -1 * ((64 + 10 + 64 + 10 + 64) / 2), new Vector2(-0.25f, 0.5f), this.MenuRect, upArrowTex, upButton));
+            Buttons.Add(new MenuButton(64, 64, 0, (-1 * ((64 + 10 + 64 + 10 + 64) / 2)) + 64 + 10, new Vector2(-0.25f, 0.5f), this.MenuRect, downArrowTex, downButton));
+            Buttons.Add(new MenuButton(64, 64, 0, (-1 * ((64 + 10 + 64 + 10 + 64) / 2)) + 64 + 10 + 64 + 10, new Vector2(-0.25f, 0.5f), this.MenuRect, okButtonTex, enterButton));
         }
 
         public Texture2D getTextureFromTileSheet(Texture2D tileSheet, int tilePosition, int width, int height)
@@ -72,23 +72,6 @@ namespace WaitAround
             MenuRect = drawBaseMenu(b2, 450, 300, 550, 300);
             foreach (MenuButton button in Buttons)
             {
-                // HACK HACK HACK THIS IS SO BAD
-                if (button.id == 1 || button.id == 2 || button.id == 3)
-                {
-                    button.relativeX = -1 * (MenuRect.Width / 4);
-                }
-                if (button.id == 1)
-                {
-                    button.relativeY = (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2);
-                }
-                if (button.id == 2)
-                {
-                    button.relativeY = (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10;
-                }
-                if (button.id == 3)
-                {
-                    button.relativeY = (MenuRect.Height / 2) - ((64 + 10 + 64 + 10 + 64) / 2) + 64 + 10 + 64 + 10;
-                }
                 button.Draw(b2, MenuRect);
             }
             String titleString = "How long do you want to wait?";

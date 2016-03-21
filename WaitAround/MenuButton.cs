@@ -21,14 +21,16 @@ namespace WaitAround
         public int relativeX { set; get; }
         public int relativeY { set; get; }
         public Rectangle buttonRect { set; get; }
+        public Vector2 parentMenuFactor { set; get; }
 
-        public MenuButton(int width, int height, int x, int y, Rectangle parentMenu, Texture2D buttonTex, Action<MenuButton> callbackFunction)
+        public MenuButton(int width, int height, int x, int y, Vector2 parentMenuFactor, Rectangle parentMenu, Texture2D buttonTex, Action<MenuButton> callbackFunction)
         {
             this.id = highestID + 1;
             highestID = id;
 
             this.relativeX = x;
             this.relativeY = y;
+            this.parentMenuFactor = parentMenuFactor;
 
             this.buttonRect = new Rectangle(0, 0, width, height);
             this.setAbsoluteButtonPosition(parentMenu);
@@ -46,17 +48,19 @@ namespace WaitAround
 
         private void setAbsoluteButtonPosition(Rectangle parentMenu)
         {
-            int finalButtonX = parentMenu.X + this.relativeX;
-            if (this.relativeX < 0)
+            int finalButtonX = parentMenu.X + this.relativeX + (int) Math.Floor(parentMenu.Width * this.parentMenuFactor.X);
+            if (this.relativeX + (int)Math.Floor(parentMenu.Width * this.parentMenuFactor.X) < 0)
             {
-                finalButtonX = parentMenu.X + parentMenu.Width + this.relativeX;
+                finalButtonX = parentMenu.X + parentMenu.Width + this.relativeX + (int)Math.Floor(parentMenu.Width * this.parentMenuFactor.X);
             }
+            Console.WriteLine("Button {0}\n  relativeX: {1}\n  parentMenu.Width * parentMenuFactor: {2}", this.id, this.relativeX, (int)Math.Floor(parentMenu.Width * this.parentMenuFactor.X));
 
-            int finalButtonY = parentMenu.Y + this.relativeY;
-            if (this.relativeY < 0)
+            int finalButtonY = parentMenu.Y + this.relativeY + (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y);
+            if (this.relativeY + (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y) < 0)
             {
-                finalButtonY = parentMenu.Y + parentMenu.Height + this.relativeY;
+                finalButtonY = parentMenu.Y + parentMenu.Height + this.relativeY + (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y);
             }
+            Console.WriteLine("Button {0}\n  relativeY: {1}\n  parentMenu.Height * parentMenuFactor: {2}", this.id, this.relativeY, (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y));
             this.buttonRect = new Rectangle(finalButtonX, finalButtonY, this.buttonRect.Width, this.buttonRect.Height);
         }
 
