@@ -53,14 +53,12 @@ namespace WaitAround
             {
                 finalButtonX = parentMenu.X + parentMenu.Width + this.relativeX + (int)Math.Floor(parentMenu.Width * this.parentMenuFactor.X);
             }
-            Console.WriteLine("Button {0}\n  relativeX: {1}\n  parentMenu.Width * parentMenuFactor: {2}", this.id, this.relativeX, (int)Math.Floor(parentMenu.Width * this.parentMenuFactor.X));
 
             int finalButtonY = parentMenu.Y + this.relativeY + (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y);
             if (this.relativeY + (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y) < 0)
             {
                 finalButtonY = parentMenu.Y + parentMenu.Height + this.relativeY + (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y);
             }
-            Console.WriteLine("Button {0}\n  relativeY: {1}\n  parentMenu.Height * parentMenuFactor: {2}", this.id, this.relativeY, (int)Math.Floor(parentMenu.Height * this.parentMenuFactor.Y));
             this.buttonRect = new Rectangle(finalButtonX, finalButtonY, this.buttonRect.Width, this.buttonRect.Height);
         }
 

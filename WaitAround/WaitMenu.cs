@@ -75,7 +75,6 @@ namespace WaitAround
                 button.Draw(b2, MenuRect);
             }
             String titleString = "How long do you want to wait?";
-            Console.WriteLine(Root.DialogueFont.MeasureString(titleString).X);
             b2.DrawString(Root.DialogueFont, titleString, new Vector2(MenuRect.X + (MenuRect.Width / 2) - (Root.DialogueFont.MeasureString(titleString).X / 2), MenuRect.Y + 15), Color.Black);
             String timeString = String.Format("{0:00}:{1:00}", Math.Floor(Mod.timeToWait / 60.0), Mod.timeToWait % 60);
             b2.DrawString(this.Root.DialogueFont, timeString, new Vector2((MenuRect.Width / 2) - (this.Root.DialogueFont.MeasureString(timeString).X) + MenuRect.X, (MenuRect.Height / 2) - (this.Root.DialogueFont.MeasureString(timeString).Y) + MenuRect.Y), Color.Black, 0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
